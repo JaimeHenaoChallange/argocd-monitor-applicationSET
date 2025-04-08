@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: microservices-applicationset
+  name: monitor-application-set
   namespace: argocd
 spec:
   generators:
@@ -10,7 +10,7 @@ spec:
         repoURL: https://github.com/your-org/your-repo
         revision: main
         directories:
-          - path: "microservices/*"
+          - path: "argocd-monitor-applicationSET/k8s"
   template:
     metadata:
       name: "{{path.basename}}"
@@ -22,4 +22,4 @@ spec:
         path: "{{path}}"
       destination:
         server: https://kubernetes.default.svc
-        namespace: "{{path.basename}}"
+        namespace: argocd

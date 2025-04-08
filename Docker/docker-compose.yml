@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  retry-script:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: retry-script-container
+    network_mode: host
+    volumes:
+      - ~/.kube:/root/.kube:ro
+      - ./resolv.conf:/etc/resolv.conf:ro
+    environment:
+      - KUBECONFIG=/root/.kube/config
+    command: ["bash", "/usr/local/bin/retry.sh"]

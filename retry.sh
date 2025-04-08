@@ -4,6 +4,9 @@ APP_NAME=$1
 MAX_RETRIES=5
 RETRY_COUNT=0
 
+# Obtener la URL del webhook desde el Secret
+SLACK_WEBHOOK_URL=$(kubectl get secret slack-webhook-secret -n argocd -o jsonpath='{.data.slack-webhook-url}' | base64 --decode)
+
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
   echo "Attempting to redeploy $APP_NAME (Attempt $((RETRY_COUNT + 1)))"
   argocd app sync $APP_NAME
@@ -21,7 +24,8 @@ done
 echo "$APP_NAME failed to reach Healthy state after $MAX_RETRIES attempts. Pausing application."
 argocd app pause $APP_NAME
 
-# Send notification to Slack
+# Enviar notificación a Slack
+MESSAGE="Application $APP_NAME is in degraded state after $MAX_RETRIES retries."
 curl -X POST -H 'Content-type: application/json' \
-  --data '{"text":"Application '"$APP_NAME"' is in degraded state after 5 retries."}' \
-  https://hooks.slack.com/services/your/slack/webhook/url
+  --data "{\"text\":\"$MESSAGE\"}" \
+  $SLACK_WEBHOOK_URL

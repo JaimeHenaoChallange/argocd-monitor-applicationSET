@@ -1,0 +1,21 @@
+# filepath: /workspaces/monitor-3/argocd-monitor-applicationSET/cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: retry-script-cronjob
+  namespace: argocd
+spec:
+  schedule: "*/10 * * * *" # Ejecutar cada 10 minutos
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: retry-script
+              image: retry-script:latest # Cambia esto si subiste la imagen a un registro
+              args:
+                - "<application-name>" # Reemplaza con el nombre de la aplicación a monitorear
+              env:
+                - name: KUBECONFIG
+                  value: "/root/.kube/config"
+          restartPolicy: OnFailure
