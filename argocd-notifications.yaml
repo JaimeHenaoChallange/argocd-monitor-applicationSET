@@ -1,0 +1,19 @@
+# filepath: manifests/argocd-notifications.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  service.slack: |
+    token: xoxb-your-slack-token
+  triggers: |
+    - name: on-degraded
+      condition: app.status.health.status == 'Degraded'
+      template: degraded-notification
+  templates: |
+    - name: degraded-notification
+      title: Application {{app.metadata.name}} is degraded
+      body: |
+        Application {{app.metadata.name}} is in degraded state.
+        Attempting redeployment...
